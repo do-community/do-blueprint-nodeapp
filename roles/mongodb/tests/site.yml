@@ -1,0 +1,32 @@
+# test.yml
+---
+
+- hosts: localhost
+  become: no
+  gather_facts: no
+  tasks:
+    - name: Run MongoDB cluster in Docker
+      docker_container:
+        name: "{{ item }}"
+        image: "{{ image_name }}"
+        command: "/sbin/init"
+        state: started
+        privileged: true
+      with_items:
+        - mongo1
+        - mongo2
+        - mongo3
+
+- hosts: "{{ target }}"
+  become: no
+  gather_facts: yes
+  roles:
+    - role: greendayonfire.mongodb
+      when: "'mongo_master' in group_names"
+
+- hosts: "{{ target }}"
+  become: no
+  gather_facts: yes
+  roles:
+    - role: greendayonfire.mongodb
+      when: "'mongo_replicas' in group_names"

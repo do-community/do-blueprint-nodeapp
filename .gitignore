@@ -1,0 +1,9 @@
+*.tfvars*
+!*.tfvars.j2
+*.tfstate
+*.tfstate.backup
+.terraform/
+*.swp
+*.retry
+*.DS_Store
+terraform.py

@@ -1,0 +1,14 @@
+galaxy_info:
+  author: DigitalOcean Community
+  description: Role to start the node.js blueprint app
+  company: DigitalOcean
+  license: MIT
+  min_ansible_version: 2.4
+  platforms:
+    - name: Ubuntu
+      versions:
+        - 16.04
+  galaxy_tags:
+    - node.js
+dependencies: []
+

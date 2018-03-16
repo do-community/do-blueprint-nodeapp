@@ -1,0 +1,10 @@
+---
+# Enter in the path to the block storage database volume
+mnt_dir: /var/mnt/dbvolume
+
+# Enter in the owner and group for permission assignment of the mount_dir
+mnt_owner: root
+mnt_group: root
+
+# default device name
+block_device: /dev/sda

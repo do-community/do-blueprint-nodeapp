@@ -1,0 +1,16 @@
+# DigitalOcean read/write API Token
+
+do_token = "{{ do_api_key }}"
+
+# Set the `ssh_keys` variable to a list containing your SSH key IDs given
+# by the DO API.  The definition should look something like this:
+#
+# ssh_keys = [key_id_1, key_id_2, ..., key_id_n]
+
+# These keys were added automatically by the `setup.yml` Ansible playbook.  By default,
+# every key in your DigitalOcean account was added.  Feel free to remove any key IDs that
+# you do not want added to your hosts.
+
+# ID, NAME, FINGERPRINT
+
+ssh_keys = [{{ do_ssh_key.data.ssh_key.id }}]

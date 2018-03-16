@@ -1,0 +1,140 @@
+---
+- name: Configure local system
+  hosts: localhost
+  vars:
+    terraform_provider_version: v0.0.3
+    terraform_inventory_version: v1.0.1
+    agent_msg: |
+        Ansible and Terraform are configured to use the Blueprint SSH keys.
+        To SSH into any of the created infrastructure, either provide the
+        identify file on the command line by typing...
+        
+        ssh -i ~/.ssh/blueprint-id_rsa <username>@<server_ip>
+        
+        Or start an SSH agent and add the identity to the agent...
+        
+        eval `ssh-agent`
+        ssh-add ~/.ssh/blueprint-id_rsa
+
+  tasks:
+
+      # Configure doctl and the DigitalOcean API key
+
+    - name: Ensure doctl config directory exists
+      file:
+        path: "~/.config/doctl"
+        state: directory
+        recurse: true
+
+    - name: Ensure doctl config file exists
+      file:
+        path: "~/.config/doctl/config.yaml"
+        state: touch
+      changed_when: touch_result.diff.before.state == "absent"
+      register: touch_result
+
+    - name: Check for existing API key
+      set_fact:
+        do_api_key: "{{ item.value }}"
+      no_log: true
+      with_dict: "{{ lookup('file', '~/.config/doctl/config.yaml') | default({}, boolean=True) | from_yaml }}"
+      when: "item.key == 'access-token'"
+
+    - name: Enter DigitalOcean API key if not found
+      pause:
+        prompt: "Enter your read/write DigitalOcean API key" 
+      register: prompt_response
+      when: do_api_key is not defined
+
+    - set_fact:
+        do_api_key: "{{ prompt_response.user_input }}"
+      when: do_api_key is not defined
+
+    - name: Ensure doctl is configured with API key
+      copy:
+        content: "access-token: {{ do_api_key }}"
+        dest: "~/.config/doctl/config.yaml"
+        mode: "0600"
+
+      # Configure a dedicated Blueprint SSH key pair
+
+    - name: Check for existing Blueprint SSH key pair
+      stat:
+        path: "~/.ssh/blueprint-id_rsa"
+      register: existing_key
+
+    - name: Confirm creation of new key pair
+      pause:
+        prompt: |
+            For isolation and security reasons, Blueprints use a dedicated SSH key pair to
+            manage and configure your infrastructure.  Type 'yes' at the prompt to create a
+            new SSH key pair and add the public key to your DigitalOcean.  Typing anything
+            else will terminate this setup without creating the necessary key pair.
+      register: ssh_key_prompt
+      when: not existing_key.stat.exists
+
+    - name: Generate Blueprint SSH key pair
+      shell: ssh-keygen -b 2048 -t rsa -q -N "" -f "/root/.ssh/blueprint-id_rsa"
+      when:
+        - not existing_key.stat.exists
+        -  "ssh_key_prompt.user_input | lower == 'yes'"
+
+    - name: Exit when user does not confirm SSH key creation
+      fail:
+        msg: >
+            Blueprints require a dedicated SSH key pair.  Either re-run the `setup.yml`
+            playbook and type 'yes' at the prompt, or generate a key pair externally and
+            move or link them to `~/.ssh/blueprint-id_rsa` and
+            `~/.ssh/blueprint-id_rsa.pub`.
+      when:
+        - not existing_key.stat.exists
+        - "ssh_key_prompt.user_input | lower != 'yes'"
+     
+    - name: Ensure SSH key in your DigitalOcean account
+      digital_ocean_sshkey:
+        name: "blueprint-{{ lookup('env', 'HOST_HOSTNAME') }}"
+        ssh_pub_key: "{{ lookup('file', '~/.ssh/blueprint-id_rsa.pub') }}"
+        oauth_token: "{{ do_api_key }}"
+        state: present
+      register: do_ssh_key
+
+      # Install the Terraform Ansible provider and Ansible dynamic inventory
+
+    - name: Ensure Terraform plugins directory exists
+      file:
+        path: "~/.terraform.d/plugins/linux_amd64"
+        state: directory
+        recurse: true
+
+    - name: Download and Extract the Terraform Ansible provider
+      unarchive:
+        src: "https://github.com/nbering/terraform-provider-ansible/releases/download/{{ terraform_provider_version }}/terraform-provider-ansible-linux_amd64.zip"
+        dest: "~/.terraform.d/plugins"
+        creates: "~/.terraform.d/plugins/linux_amd64/terraform-provider-ansible_{{ terraform_provider_version }}"
+        remote_src: true
+
+    - name: Download the Terraform Dynamic inventory for Ansible
+      get_url:
+        url: "https://github.com/nbering/terraform-inventory/releases/download/{{ terraform_inventory_version }}/terraform.py"
+        dest: "./terraform.py"
+        mode: "0755"
+        #creates: "./terraform.py"
+
+    - name: Ensure terraform.tfvars file generated
+      template:
+        src: terraform/terraform.tfvars.j2
+        dest: terraform/terraform.tfvars
+        backup: true
+
+    - name: Initialize the Terraform directory
+      command: terraform init
+      args:
+        chdir: "${PWD}/terraform"
+        creates: "${PWD}/terraform/.terraform"
+
+    - name: Download Ansible roles
+      command: ansible-galaxy install -r requirements.yml
+
+    - name: Display SSH agent information
+      debug:
+        msg: "{{ agent_msg.split('\n') }}"

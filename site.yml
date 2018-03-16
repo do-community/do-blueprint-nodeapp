@@ -1,0 +1,36 @@
+---
+- name: Install and configure MongoDB software  
+  hosts: mongodb
+
+  tags:
+    - mongodb
+    
+  roles:
+    - role: mongodb
+
+- name: Install and configure Node.js software
+  hosts: nodejs
+
+  tags:
+    - nodejs
+
+  roles:
+    - role: nodejs
+
+- name: Install and congigured NGINX reverse proxy e 
+  hosts: nodejs
+
+  tags:
+    - nginx
+
+  roles:
+    - role: nginx
+
+- name: Clone and start the node.js app boilerplate project
+  hosts: nodejs
+
+  tags:
+    - runstarterapp
+
+  roles:
+    - role: runstarterapp

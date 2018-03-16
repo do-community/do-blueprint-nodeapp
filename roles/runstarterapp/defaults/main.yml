@@ -1,0 +1,8 @@
+# defaults file for runstarterapp
+---
+git_repo_name: sahat/hackathon-starter
+git_repo_url: https://github.com/sahat/hackathon-starter.git
+git_repo_ssh_private_key: false
+git_repo_ssh_public_key: false
+git_repo_command: false
+project_folder_name: starter
