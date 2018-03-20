@@ -127,6 +127,7 @@ Type `yes` to confirm the operation.
 Move back to the main repository directory.  Use the `ansible -m ping` command to check whether the hosts are accessible yet:
 
 ```
+cd ..
 bp ansible -m ping all
 ```
 
