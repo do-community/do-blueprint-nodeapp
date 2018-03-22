@@ -169,19 +169,22 @@ Among other information, you should be able to see the IP addresses of each of y
 
 Once the infrastructure is configured, you can SSH into the node.js server to check that NGINX and Node.js are running.  SSH into the NGINX and Node host from the computer with your Blueprint repository (this machine will have the correct SSH credentials).
 
-1. To check if nginx is running, in the terminal type 'ps waux | grep nginx' and you should see the process running
+1. To check if nginx is running, in the terminal type ```'ps waux | grep nginx'``` and you should see the ngninx process running
 
-2. To check if node.js is installed, ssh to your new server and type 'node -v' and you should see
+2. To check if node.js is installed, ssh to your new server and type ```'node -v'``` and you should see the version of node that has been installed:
+
+```
+v6.13.1
+```
 
 #### Connect to the mongoDB server
 You can SSH into the mongoDB server to check that mongoDB is running.  SSH into the mongoDB host from the computer with your Blueprint repository.
 
 
-To check if the mongoDB port is up, in the terminal type 'nc -v localhost 27017' and you should be able to connect on port 27017
+To check if the mongoDB port is up, in the terminal type ```'nc -v localhost 27017'``` and you should be able to connect to mongodb on port 27017
 
 	
-To check if the block storage volume is available on the database server, in the terminal type 'lsblk -o NAME,FSTYPE,SIZE,MOUNTPOINT,LABEL'
-
+To check if the block storage volume is available on the database server, in the terminal type ```'lsblk -o NAME,FSTYPE,SIZE,MOUNTPOINT,LABEL'```
 
 ### Deprovisioning the Infrastructure
 
