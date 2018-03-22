@@ -227,7 +227,7 @@ You can change the number of node.js members by adjusting the `count` parameter 
 . . .
 resource "digitalocean_droplet" "nodejs" {
   count     = "1"
-  . . .
+. . .
 ```
 
 
