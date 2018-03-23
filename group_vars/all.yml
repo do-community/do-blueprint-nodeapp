@@ -8,3 +8,5 @@ mnt_group: root
 
 # default device name
 block_device: /dev/sda
+
+mongodb_net_bindip: "{{ hostvars['mongodb-1'].priv_ip_addr }}"

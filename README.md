@@ -247,5 +247,4 @@ Some of the items you may want to change:
 
 ### Backlog of features
 * Configure nginx to proxy port 80 traffic to the node app running on 8080
-* Configure the starter node app to point to the private IP address on the mongodb server
 * Format the block storage volume as XFS

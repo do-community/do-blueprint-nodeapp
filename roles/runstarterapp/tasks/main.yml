@@ -25,7 +25,7 @@
 
 
 - debug: 
-    msg: "exporting variable MONGODB_URI=mongodb://{{ hostvars['mongodb-1'].ansible_host}}:27017/test"
+    msg: "exporting variable MONGODB_URI=mongodb://{{ hostvars['mongodb-1'].priv_ip_addr }}:27017/test"
 
 - debug:
     msg: "starting Web server: open your browser to {{ hostvars['nodejs-1'].ansible_host}} to hit the NGINX server"
@@ -34,7 +34,7 @@
   #- name: Starting app with MONGODB_URI=mongodb://{{ hostvars['mongodb-1'].ansible_eth0.ipv4_secondaries[0].broadcast}}:27017/test
   become: no
   environment:
-    MONGODB_URI: mongodb://{{ hostvars['mongodb-1'].ansible_host}}:27017/test
+    MONGODB_URI: mongodb://{{ hostvars['mongodb-1'].priv_ip_addr }}:27017/test
     #MONGODB_URI: mongodb://{{ hostvars['mongodb-1'].ansible_eth0.ipv4_secondaries[0].broadcast}}:27017/test
     NODE_ENV: production
 
