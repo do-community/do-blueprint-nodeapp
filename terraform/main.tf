@@ -180,7 +180,7 @@ resource "digitalocean_firewall" "mongodb" {
     {
       protocol           = "tcp"
       port_range         = "27017-27019"
-      source_addresses   = ["0.0.0.0/0", "::/0"]
+      source_tags        = ["bp-nodeapp-nodejs"]
     },
   ]
 
