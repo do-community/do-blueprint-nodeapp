@@ -28,6 +28,7 @@ resource "digitalocean_droplet" "nodejs" {
   region    = "sfo2"
   size      = "s-1vcpu-1gb"
   monitoring = true
+  private_networking = true
   tags   = ["bp", "bp-nodeapp", "bp-nodeapp-nodejs"]
   ssh_keys  = ["${var.ssh_keys}"]
   user_data = "${file("${path.module}/files/userdata")}"
@@ -76,6 +77,7 @@ resource "ansible_host" "ansible_mongodb" {
 
   vars {
     ansible_host = "${digitalocean_droplet.mongodb.*.ipv4_address[count.index]}"
+    priv_ip_addr = "${digitalocean_droplet.mongodb.*.ipv4_address_private[count.index]}"
   }
 }
 
@@ -180,7 +182,7 @@ resource "digitalocean_firewall" "mongodb" {
     {
       protocol           = "tcp"
       port_range         = "27017-27019"
-      source_addresses   = ["0.0.0.0/0", "::/0"]
+      source_tags        = ["bp-nodeapp-nodejs"]
     },
   ]
 
