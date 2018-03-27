@@ -11,9 +11,15 @@
     chdir: /usr/local/{{ project_folder_name }}  
 
 
-- name: fix npm dependency bugg with node-saas package 
+- name: fix npm dependency bug with node-saas package 
   become: yes
   command: "npm rebuild node-sass"
+  args:
+    chdir: /usr/local/{{ project_folder_name }}  
+
+- name: install pm2 globally 
+  become: yes
+  command: "npm install -g pm2"
   args:
     chdir: /usr/local/{{ project_folder_name }}  
 
@@ -22,7 +28,6 @@
 
 #- debug:
 #    msg: "Private IP of mongoDB server: {{ hostvars['mongodb-1'].ansible_eth0.ipv4_secondaries[0].broadcast}}"
-
 
 - debug: 
     msg: "exporting variable MONGODB_URI=mongodb://{{ hostvars['mongodb-1'].priv_ip_addr }}:27017/test"
@@ -35,12 +40,8 @@
   become: no
   environment:
     MONGODB_URI: mongodb://{{ hostvars['mongodb-1'].priv_ip_addr }}:27017/test
-    #MONGODB_URI: mongodb://{{ hostvars['mongodb-1'].ansible_eth0.ipv4_secondaries[0].broadcast}}:27017/test
     NODE_ENV: production
-
-  command: "node app"
-  #command: pm2 start app --name node-app
-  
+  command: pm2 start app.js --name node-app
   args:
     chdir: /usr/local/{{ project_folder_name }}
 
