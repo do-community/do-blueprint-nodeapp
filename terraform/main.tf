@@ -146,32 +146,33 @@ resource "digitalocean_firewall" "ssh" {
   ]
 }
 
-resource "digitalocean_firewall" "nodeapp" {
-  name = "bp-nodeapp-app"
 
-  droplet_ids = ["${digitalocean_droplet.nodejs.*.id}"]
+#resource "digitalocean_firewall" "nodeapp" {
+#  name = "bp-nodeapp-app"
 
-  inbound_rule = [
-    {
-      protocol           = "tcp"
-      port_range         = "8080"
-      source_addresses   = ["0.0.0.0/0", "::/0"]
-    },
-  ]
+#  droplet_ids = ["${digitalocean_droplet.nodejs.*.id}"]
 
-  outbound_rule = [
-    {
-      protocol                = "tcp"
-      port_range              = "1-65535"
-      destination_addresses   = ["0.0.0.0/0", "::/0"]
-    },
-    {
-      protocol                = "udp"
-      port_range              = "1-65535"
-      destination_addresses   = ["0.0.0.0/0", "::/0"]
-    },
-  ]
-}
+#  inbound_rule = [
+#    {
+#      protocol           = "tcp"
+#      port_range         = "8080"
+#      source_addresses   = ["0.0.0.0/0", "::/0"]
+#    },
+#  ]
+
+#  outbound_rule = [
+#    {
+#      protocol                = "tcp"
+#      port_range              = "1-65535"
+#      destination_addresses   = ["0.0.0.0/0", "::/0"]
+#    },
+#    {
+#      protocol                = "udp"
+#      port_range              = "1-65535"
+#      destination_addresses   = ["0.0.0.0/0", "::/0"]
+#    },
+#  ]
+#}
 
 resource "digitalocean_firewall" "mongodb" {
   name = "bp-nodeapp-mongodb"

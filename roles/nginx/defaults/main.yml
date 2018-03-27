@@ -46,8 +46,15 @@ nginx_sites:
   default:
     - listen 80 default_server
     - server_name _
-    - root "{{ nginx_sites_default_root }}"
-    - index index.html
+    - location / { proxy_pass http://localhost:8080; }
+nginx_configs:
+   proxy:
+      - proxy_http_version 1.1
+      - proxy_set_header Upgrade $http_upgrade
+      - proxy_set_header Connection 'upgrade'
+      - proxy_set_header Host $host
+      - proxy_cache_bypass $http_upgrade
+  
 nginx_remove_sites: []
 nginx_disabled_sites: []
 
