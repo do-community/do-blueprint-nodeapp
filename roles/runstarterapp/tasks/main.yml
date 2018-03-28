@@ -42,7 +42,7 @@
     chdir: /usr/local/{{ project_folder_name }}
 
 - debug:
-    msg: "Playbook completed.  Open your browser to {{ hostvars['nodejs-1'].ansible_host}} to hit the NGINX proxy server"
+    msg: "Playbook completed.  Open your browser to the NGINX proxy at: http://{{ hostvars['nodejs-1'].ansible_host}}"
 
 
 

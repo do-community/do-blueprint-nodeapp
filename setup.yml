@@ -6,6 +6,8 @@
     terraform_inventory_version: v1.0.1
     agent_msg: |
         Ansible and Terraform are configured to use the Blueprint SSH keys.
+        Use `chown` now to give your user ownership of the new keys...
+        sudo chown $USER:$USER ~/.ssh/blueprint-id_rsa*
         To SSH into any of the created infrastructure, either provide the
         identify file on the command line by typing...
         
@@ -15,7 +17,6 @@
         
         eval `ssh-agent`
         ssh-add ~/.ssh/blueprint-id_rsa
-
   tasks:
 
       # Configure doctl and the DigitalOcean API key
@@ -118,7 +119,6 @@
         url: "https://github.com/nbering/terraform-inventory/releases/download/{{ terraform_inventory_version }}/terraform.py"
         dest: "./terraform.py"
         mode: "0755"
-        #creates: "./terraform.py"
 
     - name: Ensure terraform.tfvars file generated
       template:
@@ -132,8 +132,8 @@
         chdir: "${PWD}/terraform"
         creates: "${PWD}/terraform/.terraform"
 
-    #- name: Download Ansible roles
-    #  command: ansible-galaxy install -r requirements.yml
+    - name: Download Ansible roles
+      command: ansible-galaxy install -r requirements.yml
 
     - name: Display SSH agent information
       debug:

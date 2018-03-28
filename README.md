@@ -2,9 +2,9 @@
 
 Welcome to the Node.js Web App Blueprint repository.  This repository can be used to quickly set up a 2 node infrastructure with NGINX, Node.js, and MongoDB configured and ready to start developing and deploying in a secured environment that is ready to scale.
 
-This process should take between 5 and 10 minutes. 
+This process should take between five to ten minutes. 
 
-After cloning the project and executing the Terraform and Ansible steps described below, you will have a layered Web, App and Data infrastructure.  Web and app layers are deployed on a single compute server, and the database is on it's own server.  Data will be stored on hardware redundant block storage, and firewalls will be configured in front of each server to filter out undesirable traffic.  The final configuration will look as follows:
+After cloning the project and executing the Terraform and Ansible steps described below, you will have a layered Web, App and Data infrastructure.  Web and app layers are deployed on a single compute server, and the database is on it's own server.  Data will be stored on hardware redundant block storage, and firewalls will be configured in front of each server to filter out undesirable traffic. 
 
 ### Architecture of Node.js Web App Blueprint - version 1
 ![](https://blueprint-nodejs.nyc3.digitaloceanspaces.com/blueprint-v2.png)
@@ -111,6 +111,25 @@ The playbook will:
 * Initialize the `terraform` directory so that it's ready to use.
 * Install the Ansible roles needed to run the main playbook.
 
+Once the `setup.yml` playbook has finished, follow the instructions in the final output to complete the configuration.  Adjust the ownership of the generated SSH keys:
+
+```
+sudo chown $USER:$USER ~/.ssh/blueprint-id_rsa*
+```
+
+You can optionally add the key to your local SSH agent:
+
+```
+eval `ssh-agent`
+ssh-add ~/.ssh/blueprint-id_rsa
+```
+
+Otherwise, when SSHing into your Blueprint infrastructure, you will need to pass in the appropriate SSH key using the `-i` flag:
+
+```
+ssh -i ~/.ssh/blueprint-id_rsa <username>@<server_ip>
+```
+
 ### Create the Infrastructure
 
 Move into the `terraform` directory.  Adjust the `terraform.tfvars` and `main.tf` file if necessary (to adjust the number or size of your servers for instance).  When you are ready, create your infrastructure with `terraform apply`:
@@ -199,7 +218,7 @@ You will be prompted to confirm the action.  While you can easiliy spin up the i
 
 ## Ansible Roles
 
-This project uses the following roles to configure NGINX, Node.js, and MongoDB:
+This project pulled in roles from the following projects to configure NGINX, Node.js, and MongoDB:
 
 * [NGINX ansible role](https://github.com/jdauphant/ansible-role-nginx)
 * [Node.JS ansible role](https://github.com/geerlingguy/ansible-role-nodejs)
@@ -240,7 +259,7 @@ To adjust the way node, nginx, and mongoDB is deployed you need to modify the pa
 To understand what each variable means and how they work, read the variable descriptions within the README files associated with the individual roles.
 
 Some of the items you may want to change:
-* To use a clone a different boilerplate app, update the variables `git_repo_name` and `git_repo_url` in `roles/runstarterapp/defaults/main.yml`
+* To use a different boilerplate app, update the variables `git_repo_name` and `git_repo_url` in `roles/runstarterapp/defaults/main.yml`
 * To change the directory location of your node app, update the variable `project_folder_name` in `roles/runstarterapp/defaults/main.yml`
 * To change the node.js version, update the variable `nodejs_version` in `roles/nodejs/defaults/main.yml`
 
