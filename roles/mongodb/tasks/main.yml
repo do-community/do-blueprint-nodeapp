@@ -8,7 +8,7 @@
     - "{{ ansible_os_family }}.yml"
 
 - name: Include installation tasks
-  import_tasks: "install.{{ ansible_os_family | lower }}.yml"
+  include_tasks: "install.{{ ansible_os_family | lower }}.yml"
   tags: [mongodb]
 
 - name: Block storage - format and mount 
