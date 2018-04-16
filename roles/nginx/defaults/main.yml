@@ -58,7 +58,6 @@ nginx_configs:
 nginx_remove_sites: []
 nginx_disabled_sites: []
 
-nginx_configs: {}
 nginx_snippets: {}
 nginx_stream_configs: {}
 nginx_remove_configs: []
