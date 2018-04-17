@@ -10,3 +10,5 @@ mnt_group: root
 block_device: /dev/sda
 
 mongodb_net_bindip: "{{ hostvars['mongodb-1'].priv_ip_addr }}"
+
+nodejs_version: "8.x"
