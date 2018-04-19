@@ -8,19 +8,19 @@
     - "{{ ansible_os_family }}.yml"
 
 - name: Include installation tasks
-  include: "install.{{ ansible_os_family | lower }}.yml"
+  include_tasks: "install.{{ ansible_os_family | lower }}.yml"
   tags: [mongodb]
 
 - name: Block storage - format and mount 
-  include: "block-format-and-mount.yml"
+  import_tasks: "block-format-and-mount.yml"
   tags: [mongodb]
 
 - name: Include configuration.yml
-  include: configure.yml
+  import_tasks: configure.yml
   tags: [mongodb]
 
 - name: Include replication and auth configuration
-  include: replication_init_auth.yml
+  import_tasks: replication_init_auth.yml
   when: ( mongodb_replication_replset
         and mongodb_replication_replset != ''
         and mongodb_security_authorization == 'enabled'
@@ -28,7 +28,7 @@
   tags: [mongodb]
 
 - name: Include replication configuration
-  include: replication.yml
+  import_tasks: replication.yml
   when: mongodb_replication_replset and mongodb_replication_replset != ''
   tags: [mongodb]
 
@@ -47,7 +47,7 @@
   tags: [mongodb]
 
 - name: Include authorization configuration
-  include: auth_initialization.yml
+  import_tasks: auth_initialization.yml
   when: ( mongodb_security_authorization == 'enabled'
           and (not mongodb_replication_replset
           or mongodb_replication_replset == '')
@@ -93,6 +93,6 @@
   tags: [mongodb]
 
 - name: Include MMS Agent configuration
-  include: mms-agent.yml
+  import_tasks: mms-agent.yml
   when: mongodb_mms_api_key != ""
   tags: [mongodb]
