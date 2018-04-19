@@ -132,9 +132,6 @@
         chdir: "${PWD}/terraform"
         creates: "${PWD}/terraform/.terraform"
 
-    - name: Download Ansible roles
-      command: ansible-galaxy install -r requirements.yml
-
     - name: Display SSH agent information
       debug:
         msg: "{{ agent_msg.split('\n') }}"
