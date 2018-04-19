@@ -1,7 +1,12 @@
 # clone the repository
 
 - name: clone node boilerplate app from public git repository 
-  git: repo={{ git_repo_url }} dest=/usr/local/{{ project_folder_name }} force=yes accept_hostkey=yes
+  git:
+    repo: "{{ git_repo_url }}"
+    dest: "/usr/local/{{ project_folder_name }}"
+    version: "{{ git_repo_version }}"
+    force: yes
+    accept_hostkey: yes
   become: no
 
 - name: npm install based on package.json in /usr/local/{{ project_folder_name }} 
