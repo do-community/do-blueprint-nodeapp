@@ -72,10 +72,12 @@ function bp() {
     docker run -it --rm \
     -v "${PWD}":"/blueprint" \
     -v "${HOME}/.terraform.d":"/root/.terraform.d" \
-    -v "${HOME}/.ssh":"/root/.ssh" \
+    -v "${HOME}/.bp-ssh":"/root/.bp-ssh" \
     -v "${HOME}/.config":"/root/.config" \
     -e ANSIBLE_TF_DIR='./terraform' \
     -e HOST_HOSTNAME="${HOSTNAME}" \
+    -e HOST_UID="$(id -u)" \
+    -e HOST_GID="$(id -g)" \
     docommunity/bp "$@"
 }
 
