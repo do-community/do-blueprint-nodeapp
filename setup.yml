@@ -6,17 +6,16 @@
     terraform_inventory_version: v1.0.1
     agent_msg: |
         Ansible and Terraform are configured to use the Blueprint SSH keys.
-        Use `chown` now to give your user ownership of the new keys...
-        sudo chown $USER:$USER ~/.ssh/blueprint-id_rsa*
+
         To SSH into any of the created infrastructure, either provide the
         identify file on the command line by typing...
         
-        ssh -i ~/.ssh/blueprint-id_rsa <username>@<server_ip>
+        ssh -i ~/.bp-ssh/blueprint-id_rsa <username>@<server_ip>
         
         Or start an SSH agent and add the identity to the agent...
         
         eval `ssh-agent`
-        ssh-add ~/.ssh/blueprint-id_rsa
+        ssh-add ~/.bp-ssh/blueprint-id_rsa
   tasks:
 
       # Configure doctl and the DigitalOcean API key
@@ -67,15 +66,16 @@
     - name: Confirm creation of new key pair
       pause:
         prompt: |
-            For isolation and security reasons, Blueprints use a dedicated SSH key pair to
-            manage and configure your infrastructure.  Type 'yes' at the prompt to create a
-            new SSH key pair and add the public key to your DigitalOcean.  Typing anything
-            else will terminate this setup without creating the necessary key pair.
+            For isolation and security reasons, Blueprints use a dedicated SSH key pair (in
+            `~/.bp-ssh`) to manage and configure your infrastructure.  Type 'yes' at the
+            prompt to create a new SSH key pair and add the public key to your
+            DigitalOcean.  Typing anything else will terminate this setup without creating
+            the necessary key pair.
       register: ssh_key_prompt
       when: not existing_key.stat.exists
 
     - name: Generate Blueprint SSH key pair
-      shell: ssh-keygen -b 2048 -t rsa -q -N "" -f "/root/.ssh/blueprint-id_rsa"
+      shell: ssh-keygen -b 2048 -t rsa -q -N "" -f "/root/.bp-ssh/blueprint-id_rsa"
       when:
         - not existing_key.stat.exists
         -  "ssh_key_prompt.user_input | lower == 'yes'"
@@ -85,8 +85,8 @@
         msg: >
             Blueprints require a dedicated SSH key pair.  Either re-run the `setup.yml`
             playbook and type 'yes' at the prompt, or generate a key pair externally and
-            move or link them to `~/.ssh/blueprint-id_rsa` and
-            `~/.ssh/blueprint-id_rsa.pub`.
+            move or link them to `~/.bp-ssh/blueprint-id_rsa` and
+            `~/.bp-ssh/blueprint-id_rsa.pub`.
       when:
         - not existing_key.stat.exists
         - "ssh_key_prompt.user_input | lower != 'yes'"
@@ -94,7 +94,7 @@
     - name: Ensure SSH key in your DigitalOcean account
       digital_ocean_sshkey:
         name: "blueprint-{{ lookup('env', 'HOST_HOSTNAME') }}"
-        ssh_pub_key: "{{ lookup('file', '~/.ssh/blueprint-id_rsa.pub') }}"
+        ssh_pub_key: "{{ lookup('file', '~/.bp-ssh/blueprint-id_rsa.pub') }}"
         oauth_token: "{{ do_api_key }}"
         state: present
       register: do_ssh_key
@@ -131,6 +131,18 @@
       args:
         chdir: "${PWD}/terraform"
         creates: "${PWD}/terraform/.terraform"
+
+    - name: Give host user ownership of created assets
+      file:
+        path: "{{ item }}"
+        owner: "{{ lookup('env', 'HOST_UID') }}"
+        group: "{{ lookup('env', 'HOST_GID') }}"
+        recurse: true
+      with_items:
+        - /root/.bp-ssh
+        - /root/.config
+        - /root/.terraform.d
+        - /blueprint
 
     - name: Display SSH agent information
       debug:
